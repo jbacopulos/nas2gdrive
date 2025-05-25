@@ -72,7 +72,7 @@ Instead of manually running the backup script, **schedule it using a cron job**.
 3. **Add the following line** to run the backup every 10 days at 2:00 AM:
 
    ```bash
-   0 2 */10 * * /home/backupuser/NASPeriodicBackup/backup.sh >> /home/backupuser/NASPeriodicBackup backup.log 2>&1
+   0 2 */10 * * /home/backupuser/nas2gdrive/backup.sh >> /home/backupuser/nas2gdrive backup.log 2>&1
    ```
 
    This will:
@@ -96,7 +96,7 @@ Instead of manually running the backup script, **schedule it using a cron job**.
 ```dotenv
 NAS_DIR="/srv/dev-disk-by-uuid-xxx/NAS"
 BACKUP_DIR="/home/backupuser/backups"
-PYTHON_SCRIPT="/home/backupuser/NASPeriodicBackup/main.py"
+PYTHON_SCRIPT="/home/backupuser/nas2gdrive/main.py"
 ```
 
 ## Troubleshooting
