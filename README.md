@@ -6,13 +6,13 @@ This project automates the process of backing up a NAS directory by zipping its 
 
 - `main.py`: Python script to upload a given file to Google Drive.
 - `backup.sh`: Bash script to zip the NAS folder and invoke the Python script.
-- `.env`: Environment variables used by `backup.sh`.
+- `.env`: Environment variables used by `backup.sh` and `main.py`.
 
 ## Requirements
 
 - Python 3.8+
 - `pip` installed
-- A Google Cloud service account with a JSON key
+- Google OAuth Credentials
 - Google Drive API enabled for your project
 
 ## Installation
@@ -30,7 +30,7 @@ This project automates the process of backing up a NAS directory by zipping its 
    python3 -m venv .venv
    source .venv/bin/activate
    pip install --upgrade pip
-   pip install google-api-python-client google-auth google-auth-oauthlib
+   pip install google-api-python-client google-auth google-auth-oauthlib python-dotenv
    ```
 
 3. **Prepare your `.env` file**:
@@ -41,17 +41,11 @@ This project automates the process of backing up a NAS directory by zipping its 
    NAS_DIR="/path/to/your/nas"
    BACKUP_DIR="/path/to/your/backup_folder"
    PYTHON_SCRIPT="/path/to/this/project/main.py"
+   CLIENT_ID="YOUR GOOGLE OAUTH CLIENT ID"
+   CLIENT_SECRET="YOUR GOOGLE OAUTH CLIENT SECRET"
+   REFRESH_TOKEN="YOUR GOOGLE OAUTH REFRESH TOKEN"
+   FOLDER_ID="THE GOOGLE DRIVE FOLDER TO SAVE BACKUPS"
    ```
-
-4. **Add your Google service account credentials**:
-
-   - Download your service account JSON key from Google Cloud Console.
-   - Save it as `uploader.json` in the project directory.
-
-5. **Set up your Google Drive Folder ID**:
-
-   - In `main.py`, update the `folder_id` variable with the ID of the Google Drive folder where you want to upload the backup.
-   - Optionally, you can modify the script to pass `folder_id` as an argument instead of hardcoding.
 
 ## Usage
 
@@ -72,12 +66,12 @@ Instead of manually running the backup script, **schedule it using a cron job**.
 3. **Add the following line** to run the backup every 10 days at 2:00 AM:
 
    ```bash
-   0 2 */10 * * /home/backupuser/nas2gdrive/backup.sh >> /home/backupuser/nas2gdrive backup.log 2>&1
+   0 2 */10 * * /home/backupuser/nas2gdrive/backup.sh >> /home/backupuser/nas2gdrive backups.log 2>&1
    ```
 
    This will:
    - Execute the `backup.sh` script every 10 days at 2:00 AM.
-   - Append output and errors to `backup.log` in the same directory.
+   - Append output and errors to `backups.log` in the same directory.
 
 ## Example Directory Structure
 
@@ -86,9 +80,8 @@ Instead of manually running the backup script, **schedule it using a cron job**.
 ├── .env
 ├── .venv/
 ├── backup.sh
-├── backup.log
-├── main.py
-└── uploader.json
+├── backups.log
+└── main.py
 ```
 
 ## Example `.env` file
@@ -97,11 +90,14 @@ Instead of manually running the backup script, **schedule it using a cron job**.
 NAS_DIR="/srv/dev-disk-by-uuid-xxx/NAS"
 BACKUP_DIR="/home/backupuser/backups"
 PYTHON_SCRIPT="/home/backupuser/nas2gdrive/main.py"
+CLIENT_ID="291527076548-asdfasdfasdfasdfasdfasdf.apps.googleusercontent.com"
+CLIENT_SECRET="GOCSPX-asdfasdfasdfasdfasdf-Oe9r1"
+REFRESH_TOKEN="1//asdfasdfasdfasdfasdf-L9IrqyA-asdfasdfasdfasdfasdfasdfasdf-R8"
+FOLDER_ID="1-asdfasdfasdfasdfasdfasdf"
 ```
 
 ## Troubleshooting
 
-- **Authentication errors**: Make sure the service account has access to the target Google Drive folder.
 - **Missing modules**: Verify you activated the virtual environment and installed the required Python packages.
 - **Permissions**: Ensure that `backup.sh` has execute permissions (`chmod +x backup.sh`).
 - **Environment issues in cron**: Since cron jobs use a minimal environment, ensure that absolute paths are correctly specified in `.env` and scripts.

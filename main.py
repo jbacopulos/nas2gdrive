@@ -1,25 +1,29 @@
-from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
+from dotenv import load_dotenv
+from pathlib import Path
 import os
 import sys
 
-# Path to your downloaded service account key
-SERVICE_ACCOUNT_FILE = "uploader.json"
-
-# Set the Drive API scope
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
-# Authenticate
-credentials = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES
-)
 
-drive_service = build("drive", "v3", credentials=credentials)
-
-
-# Upload a file
 def upload_file(file_path, folder_id=None):
+    credentials = Credentials(
+        None,
+        refresh_token=os.getenv("REFRESH_TOKEN"),
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=os.getenv("CLIENT_ID"),
+        client_secret=os.getenv("CLIENT_SECRET"),
+        scopes=os.getenv("SCOPES"),
+    )
+
+    credentials.refresh(Request())
+
+    drive_service = build("drive", "v3", credentials=credentials)
+
     file_metadata = {"name": os.path.basename(file_path)}
 
     if folder_id:
@@ -42,6 +46,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     file_path = sys.argv[1]
-    folder_id = "1-eSpABx1mxWSiEGr_qolFiF2K5XTT3LT"  # Still hardcoded, or make it an arg too if you want
 
-    upload_file(file_path, folder_id)
+    script_dir = Path(__file__).resolve().parent
+    dotenv_path = script_dir / ".env"
+
+    load_dotenv(dotenv_path=dotenv_path)
+    upload_file(file_path, os.getenv("FOLDER_ID"))
